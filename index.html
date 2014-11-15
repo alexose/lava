@@ -3,24 +3,9 @@
   <!-- bower:css -->
   <link rel="stylesheet" href="public/lib/mapbox.js/mapbox.css" />
   <link rel="stylesheet" href="public/lib/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="public/lib/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css" />
   <!-- endbower -->
-  <style>
-    #map {
-      position:absolute;
-      top:0;
-      bottom:0;
-      left: 0;
-      right: 0;
-      width:100%;
-    }
-    input[type="range"]{
-      position: absolute;
-      bottom: 15px;
-      left: 10%;
-      width: 80%;
-      z-index: 1001;
-    }
-  </style>
+  <link rel="stylesheet" href="public/css/styles.css" />
 </head>
 <body>
 
@@ -36,15 +21,23 @@
         <div class="modal-body">
           <p>Lava data from the USGS and HVO</p>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Explore</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <div id="controls"></div>
+
   <!-- bower:js -->
+  <script src="public/lib/modernizr/modernizr.js"></script>
   <script src="public/lib/jquery/dist/jquery.js"></script>
   <script src="public/lib/d3/d3.js"></script>
   <script src="public/lib/mapbox.js/mapbox.js"></script>
   <script src="public/lib/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="public/lib/jquery-bridget/jquery.bridget.js"></script>
+  <script src="public/lib/seiyria-bootstrap-slider/js/bootstrap-slider.js"></script>
   <!-- endbower -->
   <script src="public/js/map.js"></script>
   <script src="public/js/slider.js"></script>
