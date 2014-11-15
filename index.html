@@ -2,6 +2,7 @@
 <head>
   <!-- bower:css -->
   <link rel="stylesheet" href="public/lib/mapbox.js/mapbox.css" />
+  <link rel="stylesheet" href="public/lib/bootstrap/dist/css/bootstrap.css" />
   <!-- endbower -->
   <style>
     #map {
@@ -25,13 +26,30 @@
 
   <div id="map" class=""></div>
 
+  <div class="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h2 class="modal-title">Lava map</h2>
+        </div>
+        <div class="modal-body">
+          <p>Lava data from the USGS and HVO</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- bower:js -->
   <script src="public/lib/jquery/dist/jquery.js"></script>
   <script src="public/lib/d3/d3.js"></script>
   <script src="public/lib/mapbox.js/mapbox.js"></script>
+  <script src="public/lib/bootstrap/dist/js/bootstrap.js"></script>
   <!-- endbower -->
   <script src="public/js/map.js"></script>
-  <script src="public/js/modal.js"></script>
   <script src="public/js/slider.js"></script>
+  <script>
+    $('.modal').modal()
+  </script>
 </body>
 </html>
