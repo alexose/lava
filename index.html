@@ -2,43 +2,36 @@
 <head>
   <!-- bower:css -->
   <link rel="stylesheet" href="public/lib/mapbox.js/mapbox.css" />
-  <link rel="stylesheet" href="public/lib/bootstrap/dist/css/bootstrap.css" />
-  <link rel="stylesheet" href="public/lib/bootstrap-slider/slider.css" />
   <!-- endbower -->
   <style>
-    .container-map{
-      position: relative;
-      height: 400px;
-    }
-
     #map {
       position:absolute;
       top:0;
       bottom:0;
+      left: 0;
+      right: 0;
       width:100%;
+    }
+    input[type="range"]{
+      position: absolute;
+      bottom: 15px;
+      left: 10%;
+      width: 80%;
+      z-index: 1001;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="jumbotron">
-      <h1>Lava Map <small>USGS and HVO data</small></h1>
-      <p class="lead">Explore the progress of the 2014 lava flow.</p>
-    </div>
-  </div>
-
-  <div class="container-fluid container-map">
-    <div id="map" class=""></div>
-  </div>
+  <div id="map" class=""></div>
 
   <!-- bower:js -->
   <script src="public/lib/jquery/dist/jquery.js"></script>
   <script src="public/lib/d3/d3.js"></script>
   <script src="public/lib/mapbox.js/mapbox.js"></script>
-  <script src="public/lib/bootstrap/dist/js/bootstrap.js"></script>
-  <script src="public/lib/bootstrap-slider/bootstrap-slider.js"></script>
   <!-- endbower -->
-  <script src="public/js/script.js"></script>
+  <script src="public/js/map.js"></script>
+  <script src="public/js/modal.js"></script>
+  <script src="public/js/slider.js"></script>
 </body>
 </html>
