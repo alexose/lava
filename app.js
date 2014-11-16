@@ -1,7 +1,6 @@
 /*jshint laxcomma: true */
 var http = require('http')
   , url  = require('url')
-  , fs   = require('fs')
   , log  = require('npmlog')
   , options = require('./config.js')
   , ns = require('node-static');
@@ -38,9 +37,7 @@ function main(request, response){
   function explain(){
 
     try {
-      fs.readFile(options.index, 'utf8', function(err, html){
-        respond(html, null, 'text/html');
-      });
+      file.serveFile('/index.html', 500, {}, request, response);
     } catch(e){
       respond('Couldn\'t find ' + options.index, 404);
     }
