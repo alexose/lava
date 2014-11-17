@@ -23,6 +23,7 @@
     "mapbox.js": "~2.1.3",
     "jquery": "~2.1.1",
     "bootstrap": "~3.3.1",
-    "seiyria-bootstrap-slider": "~4.2.0"
+    "seiyria-bootstrap-slider": "~4.2.0",
+    "interact": "~1.1.2"
   }
 }

@@ -38,11 +38,18 @@
   <script src="public/lib/bootstrap/dist/js/bootstrap.js"></script>
   <script src="public/lib/jquery-bridget/jquery.bridget.js"></script>
   <script src="public/lib/seiyria-bootstrap-slider/js/bootstrap-slider.js"></script>
+  <script src="public/lib/interact/interact.js"></script>
   <!-- endbower -->
   <script src="public/js/map.js"></script>
+  <script src="public/js/edit.js"></script>
   <script src="public/js/slider.js"></script>
   <script>
-    $('.modal').modal()
+    if (typeof localStorage !== 'undefined'){
+      if (localStorage.getItem('visited')){
+        localStorage.setItem('visited', true);
+        $('.modal').modal()
+      }
+    }
   </script>
 </body>
 </html>
