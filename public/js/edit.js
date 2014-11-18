@@ -14,7 +14,7 @@ Editor.prototype.init = function(){
 };
 
 Editor.prototype.initMessage = function(){
-  $(this.templates.message)
+  var message = $(this.templates.message)
     .appendTo(this.target);
 
   return this;
@@ -57,10 +57,11 @@ Editor.prototype.initSlider = function(){
     .appendTo(target)
     .slider({
       orientation: 'vertical',
+      reversed: true
     })
     .on('slide', function(evt){
       if (this.canvas){
-        $(this.canvas).css('opacity', 1 / evt.value);
+        $(this.canvas).css('opacity', evt.value / 100);
       }
     }.bind(this));
 
@@ -145,8 +146,8 @@ Editor.prototype.createImage = function(file){
 };
 
 Editor.prototype.templates = {
-  message : '<div class="alert alert-warning" role="alert">Drag an image onto the map in order to place it.</div>',
-  slider : '<input type="text" data-slider-id="slider" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="14"/>'
+  message : '<div class="alert alert-warning" role="alert">  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><strong>Edit mode</strong>: Drag an image onto the map in order to place it.</div>',
+  slider : '<input type="text" data-slider-id="slider" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="100"/>'
 };
 
 

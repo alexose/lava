@@ -32,3 +32,11 @@
   height: 80%;
   z-index: 1001;
 }
+
+.alert {
+  position: absolute;
+  top: 13px;
+  left: 100px;
+  z-index: 1002;
+  min-width: 450px;
+}
