@@ -10,11 +10,12 @@ Editor.prototype.init = function(){
   this
     .initMessage()
     .initDrop()
-    .initSlider();
+    .initSlider()
+    .initButtons();
 };
 
 Editor.prototype.initMessage = function(){
-  var message = $(this.templates.message)
+  this.message = $(this.templates.message)
     .appendTo(this.target);
 
   return this;
@@ -43,6 +44,7 @@ Editor.prototype.initDrop = function(){
     if(dt.files.length > 0){
       var file = dt.files[0];
       self.createImage.call(self, file);
+      self.message.remove();
     }
   }
 
@@ -67,6 +69,20 @@ Editor.prototype.initSlider = function(){
 
   return this;
 };
+
+Editor.prototype.initButtons = function(){
+
+  var target = $('#controls');
+
+  $(this.templates.set)
+    .appendTo(target)
+    .click(this.set.bind(this));
+
+  $(this.templates.clear)
+    .appendTo(target);
+
+  return this;
+}
 
 Editor.prototype.createImage = function(file){
 
@@ -145,11 +161,50 @@ Editor.prototype.createImage = function(file){
 
 };
 
-Editor.prototype.templates = {
-  message : '<div class="alert alert-warning" role="alert">  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><strong>Edit mode</strong>: Drag an image onto the map in order to place it.</div>',
-  slider : '<input type="text" data-slider-id="slider" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="100"/>'
+Editor.prototype.set = function(){
+  if (!this.canvas){
+    console.log("No image.")
+    return;
+  }
+
+  // Figure out canvas bounding box, in terms of lat lon
+  this.canvas;
+
+  // Get map object
+  var map;
+  $(document).one('map:instance', function(evt, _map){ map = _map; });
+  $(document).trigger('map:get');
+
+  var canvas = $(this.canvas);
+
+  var origin = map.getPixelOrigin(),
+      offset = canvas.offset(),
+      width = canvas.width(),
+      height = canvas.height();
+
+  var pt1 = L.point(origin.x + offset.left, origin.y + offset.top),
+      pt2 = L.point(origin.x + offset.left + width, origin.y + offset.top + height);
+
+  var ll1 = map.unproject(pt1),
+      ll2 = map.unproject(pt2);
+
+  var bounds = [
+      [ ll1.lat, ll1.lng ],
+      [ ll2.lat, ll2.lng ]
+  ];
+
+  // TODO: handle real images
+  var url = 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg';
+
+  L.imageOverlay(url, bounds).addTo(map);
 };
 
+Editor.prototype.templates = {
+  message : '<div class="alert alert-warning" role="alert">  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><strong>Edit mode</strong>: Drag an image onto the map in order to place it.</div>',
+  slider : '<input type="text" data-slider-id="slider" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="100"/>',
+  clear : '<button class="btn btn-secondary" type="button">Close</button>',
+  set : '<button class="btn btn-primary" type="button">Set</button>'
+};
 
 Editor.prototype.destroy = function(){
   this.element.remove();
