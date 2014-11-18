@@ -56,35 +56,51 @@ Editor.prototype.createImage = function(file){
       position : 'absolute',
       'z-index': 1030
     })
-    .appendTo(this.target);
+    .appendTo(this.target)[0];
 
-  var ctx = canvas[0].getContext('2d');
-  var img = new Image;
+  var ctx = canvas.getContext('2d'),
+      img = new Image,
+      maxHeight = 300,
+      ratio;
+
   img.src = URL.createObjectURL(file);
   img.onload = function() {
-      ctx.drawImage(img,20,20);
+
+    if(img.height > maxHeight) {
+      img.width *= maxHeight / img.height;
+      img.height = maxHeight;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+
+    ratio = img.width / img.height;
   }
 
   // Set up interact
-  interact(canvas[0])
+  interact(canvas)
     .resizable(true)
+    .squareResize(true)
     .on('resizemove', function(evt){
-       var target = $(evt.target);
+      var target = evt.target,
+          width = parseFloat(target.width),
+          height = parseFloat(target.height);
 
-       // add the change in coords to the previous width of the target element
-       var
-         newWidth  = parseFloat(target.width()) + evt.dx,
-         newHeight = parseFloat(target.height()) + evt.dy;
+      // add the change in coords to the previous width of the target element
+      var newWidth = width + evt.dx,
+          newHeight = newWidth / ratio;
 
-       // update the element's style
-       target.width(newWidth);
-       target.height(newHeight);
+      // update the element's style
+      target.width = newWidth;
+      target.height = newHeight;
 
-       ctx.drawImage(img,20,20);
+      ctx.drawImage(img,0,0,newWidth,newHeight);
     });
 
     // Set up dragging
-    interact(canvas[0])
+    interact(canvas)
     .draggable({
         max: Infinity,
         onmove: function (evt) {
@@ -98,14 +114,6 @@ Editor.prototype.createImage = function(file){
 
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
-        },
-        onend: function (evt) {
-            var textEl = evt.target.querySelector('p');
-
-            textEl && (textEl.textContent =
-                'moved a distance of '
-                + (Math.sqrt(evt.dx * evt.dx +
-                             evt.dy * evt.dy)|0) + 'px');
         }
     })
     .inertia(true)

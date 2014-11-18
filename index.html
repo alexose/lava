@@ -45,7 +45,7 @@
   <script src="public/js/slider.js"></script>
   <script>
     if (typeof localStorage !== 'undefined'){
-      if (localStorage.getItem('visited')){
+      if (!localStorage.getItem('visited')){
         localStorage.setItem('visited', true);
         $('.modal').modal()
       }
