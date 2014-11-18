@@ -9,7 +9,8 @@ Editor.prototype.init = function(){
 
   this
     .initMessage()
-    .initDrop();
+    .initDrop()
+    .initSlider();
 };
 
 Editor.prototype.initMessage = function(){
@@ -48,10 +49,28 @@ Editor.prototype.initDrop = function(){
   return this;
 };
 
+Editor.prototype.initSlider = function(){
+
+  var target = $('#controls');
+
+  this.slider = $(this.templates.slider)
+    .appendTo(target)
+    .slider({
+      orientation: 'vertical',
+    })
+    .on('slide', function(evt){
+      if (this.canvas){
+        $(this.canvas).css('opacity', 1 / evt.value);
+      }
+    }.bind(this));
+
+  return this;
+};
+
 Editor.prototype.createImage = function(file){
 
   // Append canvas
-  var canvas = $('<canvas />')
+  var canvas = this.canvas = $('<canvas />')
     .css({
       position : 'absolute',
       'z-index': 1030
@@ -126,7 +145,8 @@ Editor.prototype.createImage = function(file){
 };
 
 Editor.prototype.templates = {
-  message : '<div class="alert alert-warning" role="alert">Drag an image onto the map in order to place it.</div>'
+  message : '<div class="alert alert-warning" role="alert">Drag an image onto the map in order to place it.</div>',
+  slider : '<input type="text" data-slider-id="slider" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="14"/>'
 };
 
 

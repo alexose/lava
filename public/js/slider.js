@@ -22,5 +22,4 @@ Slider.prototype.template = '<input type="text" data-slider-id="slider" data-sli
 
 new Slider($('#controls'))
 
-
 })(jQuery);
