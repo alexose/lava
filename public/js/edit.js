@@ -8,17 +8,7 @@ var Editor = function(target){
 Editor.prototype.init = function(){
 
   this
-    .initMessage()
-    .initDrop()
-    .initSlider()
-    .initButtons();
-};
-
-Editor.prototype.initMessage = function(){
-  this.message = $(this.templates.message)
-    .appendTo(this.target);
-
-  return this;
+    .initDrop();
 };
 
 Editor.prototype.initDrop = function(){
@@ -43,68 +33,32 @@ Editor.prototype.initDrop = function(){
 
     if(dt.files.length > 0){
       var file = dt.files[0];
-      self.createImage.call(self, file);
-      self.message.remove();
+      self.modal(file);
     }
   }
 
   return this;
 };
 
-Editor.prototype.initSlider = function(){
+Editor.prototype.createImage = function(file, cb){
 
-  var target = $('#controls');
-
-  this.slider = $(this.templates.slider)
-    .appendTo(target)
-    .slider({
-      orientation: 'vertical',
-      reversed: true
-    })
-    .on('slide', function(evt){
-      if (this.canvas){
-        $(this.canvas).css('opacity', evt.value / 100);
-      }
-    }.bind(this));
-
-  return this;
-};
-
-Editor.prototype.initButtons = function(){
-
-  var target = $('#controls');
-
-  $(this.templates.set)
-    .appendTo(target)
-    .click(this.set.bind(this));
-
-  $(this.templates.clear)
-    .appendTo(target);
-
-  return this;
-}
-
-Editor.prototype.createImage = function(file){
-
-  // Append canvas
-  var canvas = this.canvas = $('<canvas />')
-    .css({
-      position : 'absolute',
-      'z-index': 1030
-    })
-    .appendTo(this.target)[0];
+  var canvas = $('<canvas />')[0];
 
   var ctx = canvas.getContext('2d'),
       img = new Image,
-      maxHeight = 300,
-      ratio;
+      maxWidth = 300;
+
+  var obj = {
+    canvas : canvas,
+    img : img
+  }
 
   img.src = URL.createObjectURL(file);
   img.onload = function() {
 
-    if(img.height > maxHeight) {
-      img.width *= maxHeight / img.height;
-      img.height = maxHeight;
+    if(img.width > maxWidth) {
+      img.height *= maxWidth / img.width;
+      img.width = maxWidth;
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -112,10 +66,90 @@ Editor.prototype.createImage = function(file){
     canvas.height = img.height;
     ctx.drawImage(img, 0, 0, img.width, img.height);
 
-    ratio = img.width / img.height;
+    if (cb){
+      cb(obj);
+    }
   }
 
+  return obj;
+};
+
+
+Editor.prototype.modal = function(file){
+
+  var element = $('#upload'),
+      self = this;
+
+  // Show image preview
+  element.find('#image-preview')
+    .append(
+      this.createImage(file).canvas
+    );
+
+  // Button behavior
+  element.find('#set-bounds')
+    .click(function(evt){
+      evt.preventDefault();
+
+      self.createImage.call(self, file, function(image){
+        self.set.call(self, image);
+      });
+
+    });
+
+  this.modal = $('#upload').modal();
+};
+
+Editor.prototype.set = function(obj){
+
+  var self = this;
+
+  this.modal.modal('hide');
+
+  // Create canvas
+  var canvas = obj.canvas,
+      img = obj.img;
+
+  // Show message
+  var message = $(this.templates.message)
+    .appendTo(this.target);
+
+  // Show buttons
+  var controls = $('#controls');
+
+  $(this.templates.set)
+    .appendTo(controls)
+    .click(function(){
+      self.finalize.call(self, canvas);
+    });
+
+  // Show slider
+  var slider = $(this.templates.slider)
+    .appendTo(controls)
+    .slider({
+      orientation: 'vertical',
+      reversed: true
+    })
+    .on('slide', function(evt){
+      $(canvas).css('opacity', evt.value / 100);
+    }.bind(this));
+
+  $(this.templates.clear)
+    .appendTo(controls);
+
+  $(canvas)
+    .css({
+      position : 'absolute',
+      top : 70,
+      left: 100,
+      'z-index': 1030
+    })
+    .appendTo(this.target);
+
   // Set up interact
+  var ratio = img.width / img.height,
+      ctx = canvas.getContext('2d');
+
   interact(canvas)
     .resizable(true)
     .squareResize(true)
@@ -139,7 +173,7 @@ Editor.prototype.createImage = function(file){
     interact(canvas)
     .draggable({
         max: Infinity,
-        onmove: function (evt) {
+        onmove: function(evt){
             var target = evt.target,
                 x = (parseFloat(target.getAttribute('data-x')) || 0) + evt.dx,
                 y = (parseFloat(target.getAttribute('data-y')) || 0) + evt.dy;
@@ -158,24 +192,16 @@ Editor.prototype.createImage = function(file){
         endOnly: true,
         elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
     });
-
 };
 
-Editor.prototype.set = function(){
-  if (!this.canvas){
-    console.log("No image.")
-    return;
-  }
+Editor.prototype.finalize = function(canvas){
 
-  // Figure out canvas bounding box, in terms of lat lon
-  this.canvas;
+  canvas = $(canvas);
 
   // Get map object
   var map;
   $(document).one('map:instance', function(evt, _map){ map = _map; });
   $(document).trigger('map:get');
-
-  var canvas = $(this.canvas);
 
   var origin = map.getPixelOrigin(),
       offset = canvas.offset(),
@@ -198,20 +224,7 @@ Editor.prototype.set = function(){
 
   L.imageOverlay(url, bounds).addTo(map);
 
-  this.modal();
-};
-
-Editor.prototype.modal = function(){
-
-  var element = $('#upload')
-
-  // Show image preview
-  element.find('#image-preview')
-    .append(
-      $(this.canvas).clone()
-    );
-
-  $('#upload').modal();
+  this.modal.modal('show');
 };
 
 Editor.prototype.submit = function(){
@@ -229,22 +242,6 @@ Editor.prototype.destroy = function(){
   return;
 };
 
-// Trigger editor on hashchange
-var editor;
-window.onhashchange = check;
-
-function check(){
-  if (window.location.hash === '#editor'){
-
-    // Initialize
-    editor = new Editor($('body'));
-  } else if (editor) {
-
-    // Destroy
-    editor.destroy();
-  }
-}
-
-check();
+new Editor($('body'));
 
 })(jQuery);
