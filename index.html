@@ -11,7 +11,7 @@
 
   <div id="map" class=""></div>
 
-  <div class="modal">
+  <div id="introduction" class="modal">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -23,6 +23,55 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary">Explore</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="upload" class="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h2 class="modal-title">Submit Data</h2>
+        </div>
+        <div class="modal-body">
+          <form id="submit-form" class="form-horizontal">
+            <fieldset>
+              <div class="form-group">
+                <label class="control-label col-md-3" for="title">Title</label>
+                <div class="col-md-7 input-group">
+                  <input id="title" name="title" type="text" placeholder="" class="form-control" required="">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-md-3" for="date">Date</label>
+                <div class="col-md-7 input-group">
+                  <input id="date" name="date" type="text" placeholder="12/05/2014" class="form-control" required="">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-md-3" for="soure">Source</label>
+                <div class="col-md-7 input-group">
+                  <input id="soure" name="soure" type="text" placeholder="http://hvo.wr.usgs.gov/maps/uploads/image-198.jpg" class="form-control" required="">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-md-3" for="author">Your Name</label>
+                <div class="col-md-7 input-group">
+                  <input id="author" name="author" type="text" placeholder="" class="form-control" required="">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-md-3" for="author">Preview:</label>
+                <div id="image-preview" class="col-md-7 input-group">
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Submit</button>
         </div>
       </div>
     </div>
@@ -47,7 +96,7 @@
     if (typeof localStorage !== 'undefined'){
       if (!localStorage.getItem('visited')){
         localStorage.setItem('visited', true);
-        $('.modal').modal()
+        $('#introduction').modal()
       }
     }
   </script>

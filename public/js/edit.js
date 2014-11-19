@@ -197,6 +197,24 @@ Editor.prototype.set = function(){
   var url = 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg';
 
   L.imageOverlay(url, bounds).addTo(map);
+
+  this.modal();
+};
+
+Editor.prototype.modal = function(){
+
+  var element = $('#upload')
+
+  // Show image preview
+  element.find('#image-preview')
+    .append(
+      $(this.canvas).clone()
+    );
+
+  $('#upload').modal();
+};
+
+Editor.prototype.submit = function(){
 };
 
 Editor.prototype.templates = {
