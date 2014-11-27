@@ -1,0 +1,22 @@
+{
+  "name": "lava",
+  "version": "1.0.0",
+  "description": "Experiments in mapping the 2014 Lava Flow that is affecting the eastern part of the island of Hawai'i",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexose/lava.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexose/lava/issues"
+  },
+  "homepage": "https://github.com/alexose/lava",
+  "dependencies": {
+    "express": "^4.10.4"
+  }
+}

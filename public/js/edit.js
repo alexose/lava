@@ -97,18 +97,21 @@ Editor.prototype.modal = function(file){
 
     });
 
-  element.find('#submit-form').submit(function(evt){
+  var form = element.find('#submit-form');
+
+  element.find('#submit-button').click(function(evt){
     evt.preventDefault();
 
-    var data = new FormData(this);
+    var data = new FormData(form[0]);
 
     $.ajax({
-      type:    'POST',
-      url:     $(this).attr('action'),
-      data:    data,
-      cache:   false,
-      success: success,
-      error:   failure
+      type:        'POST',
+      url:         form.attr('action'),
+      data:        data,
+      cache:       false,
+      processData: false,
+      success:     success,
+      error:       failure
     });
   });
 
@@ -117,8 +120,8 @@ Editor.prototype.modal = function(file){
   }
 
   function failure(response){
-
     // TODO: show errors?
+     console.log('File upload failed');
   }
 
   this.modal = $('#upload').modal();
