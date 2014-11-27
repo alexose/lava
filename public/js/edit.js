@@ -97,6 +97,30 @@ Editor.prototype.modal = function(file){
 
     });
 
+  element.find('#submit-form').submit(function(evt){
+    evt.preventDefault();
+
+    var data = new FormData(this);
+
+    $.ajax({
+      type:    'POST',
+      url:     $(this).attr('action'),
+      data:    data,
+      cache:   false,
+      success: success,
+      error:   failure
+    });
+  });
+
+  function success(response){
+     console.log('File uploaded successfully');
+  }
+
+  function failure(response){
+
+    // TODO: show errors?
+  }
+
   this.modal = $('#upload').modal();
 };
 
@@ -224,10 +248,10 @@ Editor.prototype.finalize = function(canvas){
 
   L.imageOverlay(url, bounds).addTo(map);
 
-  this.modal.modal('show');
-};
+  // Add to form
+  $('#bounds').val(JSON.stringify(bounds));
 
-Editor.prototype.submit = function(){
+  this.modal.modal('show');
 };
 
 Editor.prototype.templates = {
