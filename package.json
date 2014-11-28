@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/alexose/lava",
   "dependencies": {
-    "express": "^4.10.4"
+    "body-parser": "^1.9.3",
+    "busboy": "^0.2.9",
+    "connect-busboy": "0.0.2",
+    "express": "^4.10.4",
+    "multer": "^0.1.6"
   }
 }

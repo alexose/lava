@@ -32,8 +32,8 @@ Editor.prototype.initDrop = function(){
     var files = dt.files;
 
     if(dt.files.length > 0){
-      var file = dt.files[0];
-      self.modal(file);
+      self.file = dt.files[0];
+      self.modal();
     }
   }
 
@@ -75,9 +75,10 @@ Editor.prototype.createImage = function(file, cb){
 };
 
 
-Editor.prototype.modal = function(file){
+Editor.prototype.modal = function(){
 
   var element = $('#upload'),
+      file = this.file,
       self = this;
 
   // Show image preview
@@ -104,12 +105,17 @@ Editor.prototype.modal = function(file){
 
     var data = new FormData(form[0]);
 
+    data.append('file', self.file);
+
+    console.log(data);
+
     $.ajax({
       type:        'POST',
       url:         form.attr('action'),
       data:        data,
       cache:       false,
       processData: false,
+      contentType: false,
       success:     success,
       error:       failure
     });
