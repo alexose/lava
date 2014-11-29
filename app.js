@@ -23,6 +23,7 @@ function setup(db){
 
   app.listen(port);
   app.use('/public', express.static(__dirname + '/public'));
+  app.use('/uploads', express.static(__dirname + '/uploads'));
   app.use(multer({ dest: './uploads/'}))
 
   app.get('/', function(req,res){

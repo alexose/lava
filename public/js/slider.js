@@ -19,6 +19,10 @@ Slider.prototype.sync = function(cb){
 
     this.index = index;
 
+    this.dates = this.data.map(function(d){
+      return d.date;
+    }).sort();
+
     cb.call(this);
   }.bind(this));
 };
@@ -26,9 +30,7 @@ Slider.prototype.sync = function(cb){
 
 Slider.prototype.init = function(){
 
-  var dates = this.data.map(function(d){
-    return d.date;
-  }).sort();
+  var dates = this.dates;
 
   this.element = $(this.template)
     .appendTo(this.target)
@@ -47,8 +49,36 @@ Slider.prototype.init = function(){
 };
 
 Slider.prototype.initEvents = function(){
+
+  var dates = this.dates,
+      pos = 0;
+
+  this.element.on('slide', function(d){
+    var value = d.value.toString();
+
+    var idx = 0;
+    for (var i in dates){
+      var date = dates[i];
+      if (value <= date){
+        idx = date;
+        break;
+      }
+    }
+
+    // Position changed
+    if (idx !== pos){
+      this.show(idx);
+      pos = idx;
+    }
+
+  }.bind(this));
+
   return this;
 };
+
+Slider.prototype.show = function(date){
+  $(document).trigger('map:show', this.index[date]);
+}
 
 Slider.prototype.template = '<input type="text" data-slider-id="slider"/>';
 

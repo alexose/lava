@@ -7,4 +7,12 @@ $(document).bind('map:get', function(){
   $(document).trigger('map:instance', map);
 });
 
+$(document).bind('map:show', function(evt, obj){
+
+  var b = JSON.parse(obj.bounds);
+
+  L.imageOverlay(obj.file.path, b).addTo(map);
+
+});
+
 })();
