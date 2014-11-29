@@ -32,7 +32,8 @@ Slider.prototype.init = function(){
 
   var dates = this.dates;
 
-  this.element = $(this.template)
+  // Horizontal slider
+  this.element = $(this.templates.horizontal)
     .appendTo(this.target)
     .slider({
       min : dates[0],
@@ -43,6 +44,20 @@ Slider.prototype.init = function(){
         return d3.time.format("%m-%d-%Y")(new Date(value));
       }
     });
+
+  // Opacity slider
+  var slider = $(this.templates.vertical)
+    .appendTo(controls)
+    .slider({
+      orientation: 'vertical',
+      reversed: true,
+      max : 1,
+      min : 0,
+      step : 0.01
+    })
+    .on('slide', function(evt){
+      $(document).trigger('map:opacity', evt.value);
+    }.bind(this));
 
   this
     .initEvents();
@@ -80,7 +95,11 @@ Slider.prototype.show = function(date){
   $(document).trigger('map:show', this.index[date]);
 }
 
-Slider.prototype.template = '<input type="text" data-slider-id="slider"/>';
+Slider.prototype.templates = {
+  horizontal : '<input type="text" data-slider-id="slider"/>',
+  vertical : '<input type="text" data-slider-id="slider"/>'
+};
+
 
 new Slider($('#controls'))
 

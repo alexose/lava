@@ -7,12 +7,24 @@ $(document).bind('map:get', function(){
   $(document).trigger('map:instance', map);
 });
 
+var idx = {},
+    opacity = 1;
+
 $(document).bind('map:show', function(evt, obj){
 
-  var b = JSON.parse(obj.bounds);
+  var b = JSON.parse(obj.bounds),
+      key = obj.date.toString();
 
-  L.imageOverlay(obj.file.path, b).addTo(map);
-
+  idx[key] = L.imageOverlay(obj.file.path, b).addTo(map).setOpacity(opacity);
 });
+
+$(document).bind('map:opacity', function(evt, value){
+
+  opacity = value;
+
+  for (var key in idx){
+    idx[key].setOpacity(value);
+  }
+})
 
 })();

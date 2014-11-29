@@ -163,20 +163,6 @@ Editor.prototype.set = function(obj){
       self.finalize.call(self, canvas);
     });
 
-  // Show slider
-  var slider = $(this.templates.slider)
-    .appendTo(controls)
-    .slider({
-      orientation: 'vertical',
-      reversed: true
-    })
-    .on('slide', function(evt){
-      $(canvas).css('opacity', evt.value / 100);
-    }.bind(this));
-
-  $(this.templates.clear)
-    .appendTo(controls);
-
   $(canvas)
     .css({
       position : 'absolute',
@@ -272,8 +258,6 @@ Editor.prototype.finalize = function(canvas){
 
 Editor.prototype.templates = {
   message : '<div class="alert alert-warning" role="alert">  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><strong>Edit mode</strong>: Drag an image onto the map in order to place it.</div>',
-  slider : '<input type="text" data-slider-id="slider" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="100"/>',
-  clear : '<button class="btn btn-secondary" type="button">Close</button>',
   set : '<button class="btn btn-primary" type="button">Set</button>'
 };
 
