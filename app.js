@@ -26,7 +26,7 @@ function setup(db){
   app.use(multer({ dest: './uploads/'}))
 
   app.get('/', function(req,res){
-    res.sendFile('public/index.html', { root : __dirname });
+    res.sendFile('./index.html', { root : __dirname });
   });
 
   app.get('/api', function(req,res){

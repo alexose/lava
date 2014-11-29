@@ -11,6 +11,14 @@ Slider.prototype.sync = function(cb){
 
   $.get('/api/', function(response){
     this.data = JSON.parse(response);
+
+    var index = {};
+    this.data.forEach(function(d){
+      index[d.date] = d;
+    });
+
+    this.index = index;
+
     cb.call(this);
   }.bind(this));
 };
@@ -18,11 +26,19 @@ Slider.prototype.sync = function(cb){
 
 Slider.prototype.init = function(){
 
+  var dates = this.data.map(function(d){
+    return d.date;
+  }).sort();
+
   this.element = $(this.template)
     .appendTo(this.target)
     .slider({
+      min : dates[0],
+      max : dates[dates.length-1],
+      step : 1000 * 60,
+      value : dates[0],
       formatter: function(value) {
-        return 'Current value: ' + value;
+        return d3.time.format("%m-%d-%Y")(new Date(value));
       }
     });
 
@@ -34,7 +50,7 @@ Slider.prototype.initEvents = function(){
   return this;
 };
 
-Slider.prototype.template = '<input type="text" data-slider-id="slider" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="14"/>';
+Slider.prototype.template = '<input type="text" data-slider-id="slider"/>';
 
 new Slider($('#controls'))
 
