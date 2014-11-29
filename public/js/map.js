@@ -15,7 +15,13 @@ $(document).bind('map:show', function(evt, obj){
   var b = JSON.parse(obj.bounds),
       key = obj.date.toString();
 
+  // Remove other layers
+  for (var prop in idx){
+    map.removeLayer(idx[prop]);
+  }
+
   idx[key] = L.imageOverlay(obj.file.path, b).addTo(map).setOpacity(opacity);
+
 });
 
 $(document).bind('map:opacity', function(evt, value){
