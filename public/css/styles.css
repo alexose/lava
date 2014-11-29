@@ -53,3 +53,7 @@
   z-index: 1002;
   min-width: 450px;
 }
+
+.post-error{
+  color : red;
+}

@@ -107,7 +107,7 @@ Editor.prototype.modal = function(){
 
     data.append('file', self.file);
 
-    console.log(data);
+    $('.post-error').remove();
 
     $.ajax({
       type:        'POST',
@@ -126,8 +126,15 @@ Editor.prototype.modal = function(){
   }
 
   function failure(response){
-    // TODO: show errors?
-     console.log('File upload failed');
+     var obj = JSON.parse(response.responseText);
+
+     for (var prop in obj){
+       element.find('#' + prop).after(
+          $('<p />')
+            .text(obj[prop])
+            .addClass('post-error')
+       )
+     }
   }
 
   this.modal = $('#upload').modal();

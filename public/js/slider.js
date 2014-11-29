@@ -1,18 +1,34 @@
 (function($){
 
 var Slider = function(target){
-  this.element = $(this.template)
-    .appendTo(target)
-    .slider({
-      formatter: function(value) {
-        return 'Current value: ' + value;
-      },
-    });
-
-  this.initEvents();
+  this.target = target;
+  this.sync(this.init);
 
   return this.element;
 }
+
+Slider.prototype.sync = function(cb){
+
+  $.get('/api/', function(response){
+    this.data = JSON.parse(response);
+    cb.call(this);
+  }.bind(this));
+};
+
+
+Slider.prototype.init = function(){
+
+  this.element = $(this.template)
+    .appendTo(this.target)
+    .slider({
+      formatter: function(value) {
+        return 'Current value: ' + value;
+      }
+    });
+
+  this
+    .initEvents();
+};
 
 Slider.prototype.initEvents = function(){
   return this;
