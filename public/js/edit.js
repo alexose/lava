@@ -7,6 +7,11 @@ var Editor = function(target){
 
 Editor.prototype.init = function(){
 
+  // Get map object
+  var self = this;
+  $(document).one('map:instance', function(evt, _map){ self.map = _map; });
+  $(document).trigger('map:get');
+
   this
     .initDrop();
 };
@@ -157,6 +162,10 @@ Editor.prototype.set = function(obj){
   // Show buttons
   var controls = $('#controls');
 
+  $(document).bind('map:opacity', function(evt, value){
+    $(canvas).css('opacity', value);
+  });
+
   $(this.templates.set)
     .appendTo(controls)
     .click(function(){
@@ -222,20 +231,17 @@ Editor.prototype.set = function(obj){
 
 Editor.prototype.finalize = function(canvas){
 
+  map = this.map;
+
   canvas = $(canvas);
 
-  // Get map object
-  var map;
-  $(document).one('map:instance', function(evt, _map){ map = _map; });
-  $(document).trigger('map:get');
-
-  var origin = map.getPixelOrigin(),
+  var origin = map.getPixelBounds(),
       offset = canvas.offset(),
       width = canvas.width(),
       height = canvas.height();
 
-  var pt1 = L.point(origin.x + offset.left, origin.y + offset.top),
-      pt2 = L.point(origin.x + offset.left + width, origin.y + offset.top + height);
+  var pt1 = L.point(origin.min.x + offset.left, origin.min.y + offset.top),
+      pt2 = L.point(origin.min.x + offset.left + width, origin.min.y + offset.top + height);
 
   var ll1 = map.unproject(pt1),
       ll2 = map.unproject(pt2);
@@ -249,6 +255,8 @@ Editor.prototype.finalize = function(canvas){
   var url = 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg';
 
   L.imageOverlay(url, bounds).addTo(map);
+
+  // Add to form
 
   // Add to form
   $('#bounds').val(JSON.stringify(bounds));

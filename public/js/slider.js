@@ -32,26 +32,6 @@ Slider.prototype.init = function(){
 
   var dates = this.dates;
 
-  // Horizontal slider
-  this.element = $(this.templates.horizontal)
-    .appendTo(this.target)
-    .slider({
-      min : dates[0],
-      max : dates[dates.length-1],
-      step : 1000 * 60,
-      value : [dates[0], dates[1]],
-      formatter: function(arr) {
-        var start = arr[0],
-          end = arr[1],
-          format = d3.time.format("%m-%d-%Y"),
-          template = 'From {{start}} to {{end}}';
-
-        return template
-          .replace('{{start}}', format(new Date(start)))
-          .replace('{{end}}', format(new Date(end)));
-      }
-    });
-
   // Opacity slider
   var slider = $(this.templates.vertical)
     .appendTo(controls)
@@ -65,6 +45,29 @@ Slider.prototype.init = function(){
     .on('slide', function(evt){
       $(document).trigger('map:opacity', evt.value);
     }.bind(this));
+
+  // Horizontal slider
+  this.element = $(this.templates.horizontal)
+    .appendTo(this.target)
+    .slider({
+      min : dates[0],
+      max : dates[dates.length-1],
+      step : 1000 * 60,
+      value : [
+        dates[0],
+        dates[1]
+      ],
+      formatter: function(arr) {
+        var start = arr[0],
+          end = arr[1],
+          format = d3.time.format("%m-%d-%Y"),
+          template = 'From {{start}} to {{end}}';
+
+        return template
+          .replace('{{start}}', format(new Date(start)))
+          .replace('{{end}}', format(new Date(end)));
+      }
+    });
 
   this
     .initEvents();
