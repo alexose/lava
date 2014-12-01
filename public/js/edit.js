@@ -221,12 +221,7 @@ Editor.prototype.set = function(obj){
             target.setAttribute('data-y', y);
         }
     })
-    .inertia(true)
-    .restrict({
-        drag: "parent",
-        endOnly: true,
-        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-    });
+    .inertia(true);
 };
 
 Editor.prototype.finalize = function(canvas){
