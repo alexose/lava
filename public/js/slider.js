@@ -39,9 +39,16 @@ Slider.prototype.init = function(){
       min : dates[0],
       max : dates[dates.length-1],
       step : 1000 * 60,
-      value : dates[0],
-      formatter: function(value) {
-        return d3.time.format("%m-%d-%Y")(new Date(value));
+      value : [dates[0], dates[1]],
+      formatter: function(arr) {
+        var start = arr[0],
+          end = arr[1],
+          format = d3.time.format("%m-%d-%Y"),
+          template = 'From {{start}} to {{end}}';
+
+        return template
+          .replace('{{start}}', format(new Date(start)))
+          .replace('{{end}}', format(new Date(end)));
       }
     });
 
@@ -65,25 +72,25 @@ Slider.prototype.init = function(){
 
 Slider.prototype.initEvents = function(){
 
-  var dates = this.dates,
+  var data = this.data,
       pos = 0;
 
   this.element.on('slide', function(d){
-    var value = d.value.toString();
 
-    var idx = 0;
-    for (var i in dates){
-      var date = dates[i];
-      if (value <= date){
-        idx = date;
-        break;
+    var start = d.value[0],
+      end = d.value[1];
+
+    for (var i in data){
+      var post = data[i];
+      if (post.date >= start && post.date <= end){
+        if (!post.visible){
+          this.show(post);
+        }
+      } else {
+        if (post.visible){
+          this.hide(post);
+        }
       }
-    }
-
-    // Position changed
-    if (idx !== pos){
-      this.show(idx);
-      pos = idx;
     }
 
   }.bind(this));
@@ -91,9 +98,15 @@ Slider.prototype.initEvents = function(){
   return this;
 };
 
-Slider.prototype.show = function(date){
-  $(document).trigger('map:show', this.index[date]);
-}
+Slider.prototype.show = function(post){
+  post.visible = true;
+  $(document).trigger('map:show', post)
+};
+
+Slider.prototype.hide = function(post){
+  post.visible = false;
+  $(document).trigger('map:hide', post);
+};
 
 Slider.prototype.templates = {
   horizontal : '<input type="text" data-slider-id="slider"/>',
