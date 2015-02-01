@@ -129,8 +129,6 @@ Editor.prototype.set = function(url, ll, aspect){
      pixels.y + ( height / 2 )
   );
 
-  console.log(pt1, pt2);
-
   var bounds = [
     map.unproject(pt1),
     map.unproject(pt2)
@@ -141,7 +139,8 @@ Editor.prototype.set = function(url, ll, aspect){
   var layer = map.getPanes().overlayPane,
     img = $(layer).find('img');
 
-  img.click(function(evt){
+  $(layer).bind('mousedown', function(evt){
+    return false;
   });
 
   interact(img)
