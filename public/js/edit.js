@@ -18,13 +18,12 @@ Editor.prototype.init = function(){
 
 Editor.prototype.initDrop = function(){
 
-  var target = this.target,
-      self = this;
+  var target = this.target;
 
   target
     .bind('dragenter', ignoreDrag)
     .bind('dragover', ignoreDrag)
-    .bind('drop', drop);
+    .bind('drop', drop.bind(this));
 
   function ignoreDrag(e) {
     e.originalEvent.stopPropagation();
@@ -37,13 +36,121 @@ Editor.prototype.initDrop = function(){
     var files = dt.files;
 
     if(dt.files.length > 0){
-      self.file = dt.files[0];
-      self.modal();
+
+      var file = dt.files[0];
+
+      this.createImage(file, function(){
+        this.upload(file, function(obj){
+
+          var url = obj.url;
+
+          this.set(url);
+        }.bind(this));
+      }.bind(this));
     }
   }
 
   return this;
 };
+
+Editor.prototype.upload = function(file, cb){
+
+    var data = new FormData();
+    data.append('file', file);
+
+    $.ajax({
+      type:        'POST',
+      url:         '/api',
+      data:        data,
+      cache:       false,
+      processData: false,
+      contentType: false,
+      success:     success,
+      error:       failure
+    });
+
+    function success(response){
+      console.log('File uploaded successfully');
+      var obj = JSON.parse(response);
+      cb(obj);
+    }
+
+    function failure(response){
+      var obj = JSON.parse(response.responseText);
+      console.log(obj);
+    }
+};
+
+Editor.prototype.set = function(url){
+
+  // Show message
+  var message = $(this.templates.message)
+    .appendTo(this.target);
+
+  // Show buttons
+  var controls = $('#controls');
+
+  $(document).bind('map:opacity', function(evt, value){
+    $(canvas).css('opacity', value);
+  });
+
+  $(this.templates.set)
+    .appendTo(controls)
+    .click(function(){
+      this.finalize(canvas);
+    }.bind(this));
+
+
+  var bounds = [
+    [19.498695 , -154.969467],
+    [19.5 , -155]
+  ];
+
+  L.imageOverlay(url, bounds).addTo(this.map);
+
+  // Set up interact
+  var ratio = img.width / img.height,
+      ctx = canvas.getContext('2d');
+
+  interact(canvas)
+    .resizable(true)
+    .squareResize(true)
+    .on('resizemove', function(evt){
+      var target = evt.target,
+          width = parseFloat(target.width),
+          height = parseFloat(target.height);
+
+      // add the change in coords to the previous width of the target element
+      var newWidth = width + evt.dx,
+          newHeight = newWidth / ratio;
+
+      // update the element's style
+      target.width = newWidth;
+      target.height = newHeight;
+
+      ctx.drawImage(img,0,0,newWidth,newHeight);
+    });
+
+    // Set up dragging
+    interact(canvas)
+    .draggable({
+        max: Infinity,
+        onmove: function(evt){
+            var target = evt.target,
+                x = (parseFloat(target.getAttribute('data-x')) || 0) + evt.dx,
+                y = (parseFloat(target.getAttribute('data-y')) || 0) + evt.dy;
+
+            target.style.webkitTransform =
+            target.style.transform =
+                'translate(' + x + 'px, ' + y + 'px)';
+
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+        }
+    })
+    .inertia(true);
+};
+
 
 Editor.prototype.createImage = function(file, cb){
 
@@ -126,102 +233,6 @@ Editor.prototype.modal = function(){
     });
   });
 
-  function success(response){
-     console.log('File uploaded successfully');
-  }
-
-  function failure(response){
-     var obj = JSON.parse(response.responseText);
-
-     for (var prop in obj){
-       element.find('#' + prop).after(
-          $('<p />')
-            .text(obj[prop])
-            .addClass('post-error')
-       )
-     }
-  }
-
-  this.modal = $('#upload').modal();
-};
-
-Editor.prototype.set = function(obj){
-
-  var self = this;
-
-  this.modal.modal('hide');
-
-  // Create canvas
-  var canvas = obj.canvas,
-      img = obj.img;
-
-  // Show message
-  var message = $(this.templates.message)
-    .appendTo(this.target);
-
-  // Show buttons
-  var controls = $('#controls');
-
-  $(document).bind('map:opacity', function(evt, value){
-    $(canvas).css('opacity', value);
-  });
-
-  $(this.templates.set)
-    .appendTo(controls)
-    .click(function(){
-      self.finalize.call(self, canvas);
-    });
-
-  $(canvas)
-    .css({
-      position : 'absolute',
-      top : 70,
-      left: 100,
-      'z-index': 1030
-    })
-    .appendTo(this.target);
-
-  // Set up interact
-  var ratio = img.width / img.height,
-      ctx = canvas.getContext('2d');
-
-  interact(canvas)
-    .resizable(true)
-    .squareResize(true)
-    .on('resizemove', function(evt){
-      var target = evt.target,
-          width = parseFloat(target.width),
-          height = parseFloat(target.height);
-
-      // add the change in coords to the previous width of the target element
-      var newWidth = width + evt.dx,
-          newHeight = newWidth / ratio;
-
-      // update the element's style
-      target.width = newWidth;
-      target.height = newHeight;
-
-      ctx.drawImage(img,0,0,newWidth,newHeight);
-    });
-
-    // Set up dragging
-    interact(canvas)
-    .draggable({
-        max: Infinity,
-        onmove: function(evt){
-            var target = evt.target,
-                x = (parseFloat(target.getAttribute('data-x')) || 0) + evt.dx,
-                y = (parseFloat(target.getAttribute('data-y')) || 0) + evt.dy;
-
-            target.style.webkitTransform =
-            target.style.transform =
-                'translate(' + x + 'px, ' + y + 'px)';
-
-            target.setAttribute('data-x', x);
-            target.setAttribute('data-y', y);
-        }
-    })
-    .inertia(true);
 };
 
 Editor.prototype.finalize = function(canvas){
@@ -252,11 +263,8 @@ Editor.prototype.finalize = function(canvas){
   L.imageOverlay(url, bounds).addTo(map);
 
   // Add to form
-
-  // Add to form
   $('#bounds').val(JSON.stringify(bounds));
 
-  this.modal.modal('show');
 };
 
 Editor.prototype.templates = {

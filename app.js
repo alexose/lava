@@ -30,13 +30,48 @@ function setup(db){
     res.sendFile('./index.html', { root : __dirname });
   });
 
+  // List all finished entries
   app.get('/api', function(req,res){
     collection.find({}).toArray(function(err, arr){
       res.send(JSON.stringify(arr));
     });
   });
 
+  // Post a new image or update data
   app.post('/api/', function(req, res){
+
+    var errors = {};
+
+    if (!req.files || !req.files.file) { errors.file = 'Your file did not upload correctly.'; }
+
+    var obj = {
+      path : req.files.file.path
+    }
+
+    // Write to server
+    collection.insert(obj, function(err, result){
+      if (err){
+        res.status(500);
+        res.send('could not upload');
+      } else {
+
+        // Respond with image url and mongo id
+        res.send(JSON.stringify({
+          url : obj.path,
+          id : result[0]._id
+        }));
+      }
+    });
+
+    function err(obj){
+      res.status(400);
+      res.send(JSON.stringify(obj));
+    }
+
+  });
+
+  // Add details to an image
+  app.put('/api/', function(req, res){
 
     var errors = {};
 
@@ -45,7 +80,6 @@ function setup(db){
     if (!req.body.author) { errors.author= 'Please provide your name.'; }
     if (!req.body.source) { errors.source = 'Please provide the source.'; }
     if (!req.body.date)   { errors.date = 'Please provide a date.'; }
-    if (!req.files || !req.files.file) { errors.file = 'Your file did not upload correctly.'; }
 
     if (Object.keys(errors).length){
       err(errors);
