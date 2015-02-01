@@ -136,18 +136,19 @@ Editor.prototype.set = function(url, ll, aspect){
     map.unproject(pt2)
   ];
 
-  console.log(bounds);
-
   L.imageOverlay(url, bounds).addTo(this.map);
 
-  // Set up interact
-  var ratio = img.width / img.height,
-      ctx = canvas.getContext('2d');
+  var layer = map.getPanes().overlayPane,
+    img = $(layer).find('img');
 
-  interact(canvas)
+  img.click(function(evt){
+  });
+
+  interact(img)
     .resizable(true)
     .squareResize(true)
     .on('resizemove', function(evt){
+
       var target = evt.target,
           width = parseFloat(target.width),
           height = parseFloat(target.height);
@@ -164,10 +165,11 @@ Editor.prototype.set = function(url, ll, aspect){
     });
 
     // Set up dragging
-    interact(canvas)
+    interact(layer)
     .draggable({
         max: Infinity,
         onmove: function(evt){
+
             var target = evt.target,
                 x = (parseFloat(target.getAttribute('data-x')) || 0) + evt.dx,
                 y = (parseFloat(target.getAttribute('data-y')) || 0) + evt.dy;
@@ -178,6 +180,9 @@ Editor.prototype.set = function(url, ll, aspect){
 
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
+
+            evt.stopImmediatePropagation();
+            return false;
         }
     })
     .inertia(true);
