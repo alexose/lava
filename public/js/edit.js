@@ -137,7 +137,7 @@ Editor.prototype.set = function(url, ll, aspect){
   L.imageOverlay(url, bounds).addTo(this.map);
 
   var layer = map.getPanes().overlayPane,
-    img = $(layer).find('img');
+    img = $(layer).find('img')[0];
 
   $(layer).bind('mousedown', function(evt){
     return false;
@@ -149,22 +149,24 @@ Editor.prototype.set = function(url, ll, aspect){
     .on('resizemove', function(evt){
 
       var target = evt.target,
-          width = parseFloat(target.width),
-          height = parseFloat(target.height);
+        width = parseFloat(target.width),
+        height = parseFloat(target.height);
 
       // add the change in coords to the previous width of the target element
       var newWidth = width + evt.dx,
-          newHeight = newWidth / ratio;
+        newHeight = newWidth / aspect;
 
       // update the element's style
-      target.width = newWidth;
-      target.height = newHeight;
+      $(target)
+        .width(newWidth)
+        .height(newHeight);
 
-      ctx.drawImage(img,0,0,newWidth,newHeight);
+      console.log(newWidth, newHeight);
+
     });
 
-    // Set up dragging
-    interact(layer)
+  // Set up dragging
+  interact(layer)
     .draggable({
         max: Infinity,
         onmove: function(evt){
