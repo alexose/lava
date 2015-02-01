@@ -25,6 +25,14 @@ Editor.prototype.initDrop = function(){
     .bind('dragover', ignoreDrag)
     .bind('drop', drop.bind(this));
 
+  var ll;
+
+  // Listen for latlng
+  this.map
+    .on('mousemove', function(evt){
+      ll = evt.latlng;
+    });
+
   function ignoreDrag(e) {
     e.originalEvent.stopPropagation();
     e.originalEvent.preventDefault();
@@ -32,6 +40,7 @@ Editor.prototype.initDrop = function(){
 
   function drop(e) {
     ignoreDrag(e);
+
     var dt = e.originalEvent.dataTransfer;
     var files = dt.files;
 
@@ -39,12 +48,15 @@ Editor.prototype.initDrop = function(){
 
       var file = dt.files[0];
 
-      this.createImage(file, function(){
+      this.createImage(file, function(img){
+
+        var aspect = img.width / img.height;
+
         this.upload(file, function(obj){
 
           var url = obj.url;
 
-          this.set(url);
+          this.set(url, ll, aspect);
         }.bind(this));
       }.bind(this));
     }
@@ -81,7 +93,7 @@ Editor.prototype.upload = function(file, cb){
     }
 };
 
-Editor.prototype.set = function(url){
+Editor.prototype.set = function(url, ll, aspect){
 
   // Show message
   var message = $(this.templates.message)
@@ -100,11 +112,31 @@ Editor.prototype.set = function(url){
       this.finalize(canvas);
     }.bind(this));
 
+  // Calculate bounds based on image aspect and current viewport
+  var map = this.map,
+    height = 200,
+    width = height * aspect;
+
+  var pixels = map.project(ll);
+
+  var pt1 = L.point(
+    pixels.x - ( width / 2 ),
+    pixels.y - ( height / 2 )
+  );
+
+  var pt2 = L.point(
+    pixels.x + ( width / 2 ),
+     pixels.y + ( height / 2 )
+  );
+
+  console.log(pt1, pt2);
 
   var bounds = [
-    [19.498695 , -154.969467],
-    [19.5 , -155]
+    map.unproject(pt1),
+    map.unproject(pt2)
   ];
+
+  console.log(bounds);
 
   L.imageOverlay(url, bounds).addTo(this.map);
 
@@ -151,39 +183,16 @@ Editor.prototype.set = function(url){
     .inertia(true);
 };
 
-
 Editor.prototype.createImage = function(file, cb){
 
-  var canvas = $('<canvas />')[0];
-
-  var ctx = canvas.getContext('2d'),
-      img = new Image,
-      maxWidth = 300;
-
-  var obj = {
-    canvas : canvas,
-    img : img
-  }
+  var img = new Image;
 
   img.src = URL.createObjectURL(file);
   img.onload = function() {
-
-    if(img.width > maxWidth) {
-      img.height *= maxWidth / img.width;
-      img.width = maxWidth;
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0, img.width, img.height);
-
     if (cb){
-      cb(obj);
+      cb(img);
     }
   }
-
-  return obj;
 };
 
 
